@@ -1,0 +1,25 @@
+# Cargo.toml — the root "workspace" manifest.
+#
+# In Rust, a "workspace" groups multiple crates (packages) together
+# so they share the same build output folder and can depend on each other.
+#
+# Think of it like a monorepo: one git repo, many Rust packages inside.
+#
+# Our domain-driven design splits the project into bounded contexts:
+#   • domain/      — pure business logic, NO hardware, NO network
+#   • application/ — orchestrates domain logic (use cases)
+#   • infrastructure/ — hardware drivers, HTTP clients, storage
+#   • firmware/    — the actual ESP32 binary that runs on the device
+#
+# Right now only the "domain" crate exists. We'll add the others step by step.
+
+[workspace]
+# "members" lists all the crates in this workspace.
+# Cargo will find each one by looking for a Cargo.toml inside that folder.
+members = [
+    "crates/domain",
+]
+
+# Use the "resolver version 2" — this is the modern way Rust resolves
+# feature flags for dependencies. Always use v2 for new projects.
+resolver = "2"

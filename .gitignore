@@ -1,0 +1,38 @@
+# .gitignore — tells git which files/folders to NEVER commit.
+#
+# These are files that are:
+#   1. Auto-generated (Rust build output in "target/")
+#   2. Machine-specific (IDE settings, OS files)
+#   3. Secret (credentials, API keys — NEVER commit these!)
+
+# --- RUST ---
+# "target/" is where Cargo puts all compiled output.
+# It can be gigabytes and is fully reproducible from source — don't commit it.
+/target
+
+# --- IDE / EDITOR ---
+# VS Code workspace settings (personal, not project-wide)
+.vscode/
+# JetBrains (CLion, RustRover)
+.idea/
+# Vim swap files
+*.swp
+*.swo
+
+# --- OPERATING SYSTEM ---
+# macOS metadata folders
+.DS_Store
+# Windows thumbnail cache
+Thumbs.db
+
+# --- ESP32 / EMBEDDED ---
+# OpenOCD debug session files
+*.openocd
+# Flash log files
+*.flash.log
+
+# --- SECRETS (CRITICAL — never commit API keys!) ---
+.env
+.env.local
+secrets.toml
+credentials.json

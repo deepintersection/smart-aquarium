@@ -1,0 +1,33 @@
+# crates/domain/Cargo.toml
+#
+# This is the manifest for our "domain" crate — the heart of the project.
+#
+# DOMAIN-DRIVEN DESIGN (DDD) CONCEPT:
+# The domain layer contains ONLY business logic.
+# It describes WHAT the aquarium system does, not HOW it does it.
+#
+# Rules for this crate:
+#   ✅ Can define data structures (structs, enums)
+#   ✅ Can define business rules and calculations
+#   ✅ Can define errors related to business logic
+#   ❌ Must NOT import hardware libraries (GPIO, I2C, etc.)
+#   ❌ Must NOT import HTTP / network libraries
+#   ❌ Must NOT import database libraries
+#
+# This makes the domain crate 100% testable on your laptop,
+# without any real ESP32 hardware!
+
+[package]
+name    = "domain"
+version = "0.1.0"
+edition = "2021"   # Use Rust 2021 edition — the current standard
+
+# no_std = this crate can run WITHOUT the Rust standard library.
+# The ESP32 has no OS, so eventually we'll need this.
+# For now we keep it commented out to make things simpler.
+# [profile.release]
+# We'll add ESP32-specific build settings later.
+
+[dependencies]
+# No dependencies yet — pure Rust only!
+# We'll add "no_std" compatible crates here later (e.g. heapless, defmt).
