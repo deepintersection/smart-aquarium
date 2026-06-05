@@ -6,7 +6,6 @@
 #
 # This file configures HOW CodeRabbit reviews our project.
 # Full docs: https://docs.coderabbit.ai/getting-started/configure-coderabbit
-
 # --- GENERAL SETTINGS ---
 language: "en-US"
 
@@ -37,9 +36,8 @@ reviews:
 
   # Profile controls how strict the review is:
   #   "chill"   — only important issues
-  #   "default" — balanced
-  #   "assertive" — strict, catches everything
-  profile: "default"
+  #   "assertive" — strict, catches everything (only valid values: chill|assertive)
+  profile: "assertive"
 
 # --- LANGUAGE-SPECIFIC SETTINGS ---
 language_settings:
