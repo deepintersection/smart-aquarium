@@ -27,3 +27,7 @@ pub mod sensor;
 /// Module for water-related domain concepts.
 /// Covers water quality thresholds and water-change rules.
 pub mod water;
+
+/// Module for pump and water-change decision concepts.
+/// Answers: "should we run the pumps right now?"
+pub mod pump;
