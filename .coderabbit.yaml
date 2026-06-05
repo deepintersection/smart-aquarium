@@ -1,57 +1,40 @@
-# .coderabbit.yaml
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
 #
-# CodeRabbit is an AI-powered code review tool.
-# When you open a Pull Request on GitHub, CodeRabbit will automatically
-# review the changes and post comments with suggestions.
-#
-# This file configures HOW CodeRabbit reviews our project.
-# Full docs: https://docs.coderabbit.ai/getting-started/configure-coderabbit
-# --- GENERAL SETTINGS ---
+# CodeRabbit configuration for smart-aquarium.
+# Valid keys verified against: https://coderabbit.ai/integrations/schema.v2.json
+# Only schema-defined keys are used — unknown keys cause a parse error.
+
 language: "en-US"
 
-# Enable early access features (recommended for new projects)
 early_access: true
 
-# --- REVIEW SETTINGS ---
 reviews:
-  # Request CodeRabbit to review ALL changed files in a PR
+  profile: "assertive"
   request_changes_workflow: true
-
-  # High-level summary of what changed in this PR
   high_level_summary: true
-
-  # Post a poem or fun note at the end of the review (optional, nice touch)
   poem: true
-
-  # Automatically review when a PR is opened or updated
   auto_review:
     enabled: true
-    # Also review draft PRs (useful while learning)
     drafts: true
-
-  # Paths to IGNORE during review (generated files, build artifacts, etc.)
   path_filters:
-    - "!target/**"       # Rust build output — never review compiled files
-    - "!**/*.lock"       # Cargo.lock — auto-generated dependency lockfile
+    - "!target/**"
+    - "!**/*.lock"
+  # Ask CodeRabbit to pay extra attention to Rust-specific patterns in our domain layer
+  path_instructions:
+    - path: "crates/domain/**/*.rs"
+      instructions: >
+        This is a Domain-Driven Design domain layer. Verify that:
+        (1) no hardware or network dependencies are imported,
+        (2) all public types derive Debug,
+        (3) domain invariants are enforced at construction time,
+        (4) every public function that returns a meaningful value is marked #[must_use].
 
-  # Profile controls how strict the review is:
-  #   "chill"   — only important issues
-  #   "assertive" — strict, catches everything (only valid values: chill|assertive)
-  profile: "assertive"
+  tools:
+    clippy:
+      enabled: true
 
-# --- LANGUAGE-SPECIFIC SETTINGS ---
-language_settings:
-  rust:
-    # Check for common Rust pitfalls and idioms
-    enabled: true
-
-# --- CHAT SETTINGS ---
-# You can reply to CodeRabbit comments in GitHub to ask follow-up questions.
 chat:
   auto_reply: true
 
-# --- KNOWLEDGE BASE ---
-# Tell CodeRabbit about our project so it gives relevant suggestions.
 knowledge_base:
-  # Describe the project so CodeRabbit understands the domain context
   opt_out: false
