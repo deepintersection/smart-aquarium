@@ -119,7 +119,29 @@ pub struct ParameterRange {
 
 impl ParameterRange {
     /// Creates a new ParameterRange.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the ordering invariant `critical_min ≤ min ≤ max ≤ critical_max`
+    /// is violated. This is a programming error — ranges are defined by developers
+    /// at configuration time, never from live sensor data, so a panic is
+    /// appropriate (it surfaces the mistake immediately rather than silently
+    /// producing wrong assess() results at runtime).
+    ///
+    /// ```
+    /// // Valid — values are in order:
+    /// use domain::water::ParameterRange;
+    /// let _r = ParameterRange::new(18.0, 24.0, 28.0, 32.0);
+    /// ```
     pub fn new(critical_min: f32, min: f32, max: f32, critical_max: f32) -> Self {
+        // Enforce: critical_min ≤ min ≤ max ≤ critical_max.
+        // Without this ordering, assess() would silently misclassify readings —
+        // e.g. a value inside the "warning" band could appear "critical".
+        assert!(
+            critical_min <= min && min <= max && max <= critical_max,
+            "ParameterRange invariant violated: expected critical_min({}) ≤ min({}) ≤ max({}) ≤ critical_max({})",
+            critical_min, min, max, critical_max
+        );
         Self { critical_min, min, max, critical_max }
     }
 }
@@ -216,6 +238,13 @@ impl WaterQualityAssessment {
 ///
 /// Returns the WORST status found across all parameters — if any single
 /// parameter is Critical, the whole assessment is Critical.
+///
+/// # Must use
+///
+/// The result must not be discarded — ignoring it silently means the
+/// aquarium is never alerted to a problem. The compiler will warn if you
+/// call `assess(...)` without using the returned `WaterQualityAssessment`.
+#[must_use]
 pub fn assess(params: &WaterParameters, thresholds: &WaterThresholds)
     -> WaterQualityAssessment
 {
@@ -359,5 +388,40 @@ mod tests {
         let reading = SensorReading::ph(7.0, 500);
         params.apply_reading(&reading);
         assert_eq!(params.ph, Some(7.0));
+    }
+
+    // --- ParameterRange invariant tests ---
+
+    #[test]
+    fn valid_parameter_range_is_created_successfully() {
+        // critical_min ≤ min ≤ max ≤ critical_max — must not panic
+        let _r = ParameterRange::new(18.0, 24.0, 28.0, 32.0);
+    }
+
+    #[test]
+    fn parameter_range_allows_equal_adjacent_bounds() {
+        // turbidity has critical_min == min == 0.0 — a valid edge case
+        let _r = ParameterRange::new(0.0, 0.0, 5.0, 20.0);
+    }
+
+    #[test]
+    #[should_panic(expected = "ParameterRange invariant violated")]
+    fn parameter_range_panics_when_min_below_critical_min() {
+        // min < critical_min → ordering broken
+        let _r = ParameterRange::new(24.0, 18.0, 28.0, 32.0);
+    }
+
+    #[test]
+    #[should_panic(expected = "ParameterRange invariant violated")]
+    fn parameter_range_panics_when_max_below_min() {
+        // max < min → ordering broken
+        let _r = ParameterRange::new(18.0, 28.0, 24.0, 32.0);
+    }
+
+    #[test]
+    #[should_panic(expected = "ParameterRange invariant violated")]
+    fn parameter_range_panics_when_critical_max_below_max() {
+        // critical_max < max → ordering broken
+        let _r = ParameterRange::new(18.0, 24.0, 32.0, 28.0);
     }
 }
